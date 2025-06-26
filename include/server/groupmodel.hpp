@@ -1,0 +1,22 @@
+#ifndef GORUPMODEL_H
+#define GROUPMODEL_H
+
+#include "group.hpp"
+#include <string>
+#include <vector>
+
+using namespace std;
+
+class GroupModel
+{
+public:
+    GroupModel();
+    ~GroupModel();
+
+    bool createGroup(Group &group);
+    void addGroup(int userid, int groupid, string role);
+    vector<Group> queryGroups(int userid);
+    vector<int> queryGroupUsers(int userid, int groupid);
+};
+
+#endif
