@@ -14,6 +14,7 @@ using json = nlohmann::json;
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <unordered_map>
 
 #include "group.hpp"
 #include "user.hpp"
@@ -35,7 +36,7 @@ void readTaskHandler(int clientfd);
 string getCurrentTime();
 
 // 主界面
-void mainMenu();
+void mainMenu(int clientfd);
 
 // 聊天客户端程序实现 main线程用作发送线程 子线程用做接收线程
 int main(int argc, char **argv)
@@ -185,7 +186,7 @@ int main(int argc, char **argv)
                         thread readTask(readTaskHandler, clientfd);
                         readTask.detach();
                         // 进入聊天主菜单
-                        mainMenu();
+                        mainMenu(clientfd);
                     }
                 }
             }
@@ -315,43 +316,58 @@ void readTaskHandler(int clientfd)
         // 解析收到的JSON数据
         json js = json::parse(buffer);
         
-        // 处理不同类型的消息
+        // 接收发来的消息
         int msgType = js["msgid"].get<int>();
-        switch (msgType) {
-            case ONE_CHAT_MSG: // 私聊消息
-                cout << "\n[" << js["time"] << "] " << js["fromname"] << "(" 
-                     << js["id"] << ") said: " << js["msg"] << endl;
-                break;
-                
-            case GROUP_CHAT_MSG: // 群聊消息
-                cout << "\n[" << js["time"] << "] Group(" << js["groupid"] 
-                     << ") " << js["fromname"] << " said: " << js["msg"] << endl;
-                break;
-                
-            case LOGIN_MSG_ACK: // 登录响应(已在主线程处理)
-                break;
-                
-            case REG_MSG_ACK: // 注册响应(已在主线程处理)
-                break;
-                
-            default:
-                cerr << "Invalid message type received!" << endl;
-                break;
+        if(msgType)
+        {
+            cout<<js["time"].get<string>()<<"["<<js["id"]<<"]"<<js["name"].get<string>()
+                <<"said:"<<js["msg"].get<string>()<<endl;
+            continue;
         }
-        
-        // 显示主菜单提示(保持界面友好)
-        mainMenu(); 
     }
 }
 
+void chat(int,string);
+void help(int fd=0,string="");
+void addfriend(int,string);
 
-void mainMenu() {
-    cout << "==================================" << endl;
-    cout << "1. Private Chat | 2. Group Chat" << endl;
-    cout << "3. Add Friend   | 4. Create Group" << endl;
-    cout << "5. View Friends | 6. View Groups" << endl;
-    cout << "7. Logout" << endl;
-    cout << "==================================" << endl;
-    cout << "Enter choice: ";
-    cout.flush(); // 确保及时输出
+unordered_map<string,string> commandMap={
+    {"help","显示所有指令"},
+    {"chat","one chat one"},
+    {"addfriend","addfriend:friendid"},
+    {"creategroup","creategroup:groupname:groupdesc"}
+};
+
+unordered_map<string,function<void(int,string)>> commandHandlerMap={
+    {"help",help},
+    {"chat",chat},
+    {"addfriend",addfriend}
+};
+
+void mainMenu(int clientfd) {
+    help();
+
+    char buffer[1024]={0};
+    for(;;)
+    {
+        cin.getline(buffer,1024);
+        string commandbuf(buffer);
+        string command;//storage command
+        int idx=commandbuf.find(":");
+        if(-1==idx)
+        {
+            command=commandbuf;
+        }
+        else
+        {
+            command=commandbuf.substr(0,idx);
+        }
+        auto it=commandHandlerMap.find(command);
+        if(it==commandHandlerMap.end())
+        {
+            cerr<<"invalid input command"<<endl;
+            continue;
+        }
+        it->second(clientfd,commandbuf.substr(idx+1,commandbuf.size()-idx));
+    }
 }
