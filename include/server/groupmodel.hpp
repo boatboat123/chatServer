@@ -10,8 +10,6 @@ using namespace std;
 class GroupModel
 {
 public:
-    GroupModel();
-    ~GroupModel();
 
     bool createGroup(Group &group);
     void addGroup(int userid, int groupid, string role);

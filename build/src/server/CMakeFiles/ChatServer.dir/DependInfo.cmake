@@ -4,13 +4,14 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/boat/Desktop/chat/src/server/UserModel.cpp" "/home/boat/Desktop/chat/build/src/server/CMakeFiles/ChatServer.dir/UserModel.cpp.o"
   "/home/boat/Desktop/chat/src/server/chatserver.cpp" "/home/boat/Desktop/chat/build/src/server/CMakeFiles/ChatServer.dir/chatserver.cpp.o"
   "/home/boat/Desktop/chat/src/server/chatservice.cpp" "/home/boat/Desktop/chat/build/src/server/CMakeFiles/ChatServer.dir/chatservice.cpp.o"
   "/home/boat/Desktop/chat/src/server/db/db.cpp" "/home/boat/Desktop/chat/build/src/server/CMakeFiles/ChatServer.dir/db/db.cpp.o"
-  "/home/boat/Desktop/chat/src/server/friendmodel.cpp" "/home/boat/Desktop/chat/build/src/server/CMakeFiles/ChatServer.dir/friendmodel.cpp.o"
   "/home/boat/Desktop/chat/src/server/main.cpp" "/home/boat/Desktop/chat/build/src/server/CMakeFiles/ChatServer.dir/main.cpp.o"
-  "/home/boat/Desktop/chat/src/server/offlinemessagemodel.cpp" "/home/boat/Desktop/chat/build/src/server/CMakeFiles/ChatServer.dir/offlinemessagemodel.cpp.o"
+  "/home/boat/Desktop/chat/src/server/model/UserModel.cpp" "/home/boat/Desktop/chat/build/src/server/CMakeFiles/ChatServer.dir/model/UserModel.cpp.o"
+  "/home/boat/Desktop/chat/src/server/model/friendmodel.cpp" "/home/boat/Desktop/chat/build/src/server/CMakeFiles/ChatServer.dir/model/friendmodel.cpp.o"
+  "/home/boat/Desktop/chat/src/server/model/groupmodel.cpp" "/home/boat/Desktop/chat/build/src/server/CMakeFiles/ChatServer.dir/model/groupmodel.cpp.o"
+  "/home/boat/Desktop/chat/src/server/model/offlinemessagemodel.cpp" "/home/boat/Desktop/chat/build/src/server/CMakeFiles/ChatServer.dir/model/offlinemessagemodel.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
@@ -19,6 +20,7 @@ set(CMAKE_CXX_TARGET_INCLUDE_PATH
   "../include"
   "../include/server"
   "../include/server/db"
+  "../include/server/model"
   "../thirdparty"
   )
 

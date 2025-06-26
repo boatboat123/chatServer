@@ -4,9 +4,10 @@
 #include "mymuduo/TcpConnection.h"
 #include "mymuduo/Callbacks.h"
 #include "json.hpp"
-#include "UserModel.hpp"
 #include "offlinemessagemodel.hpp"
+#include "UserModel.hpp"
 #include "friendmodel.hpp"
+#include "groupmodel.hpp"
 using json=nlohmann::json;
 
 #include <unordered_map>
@@ -15,8 +16,6 @@ using json=nlohmann::json;
 #include <string>
 
 using namespace std;
-
-
 
 using MsgHandler=function<void(const TcpConnectionPtr &conn,json &js,Timestamp)>;
 class ChatService
@@ -36,6 +35,12 @@ public:
     void oneChat(const TcpConnectionPtr &conn, json &js,Timestamp time);
     //添加好友
     void addFriend(const TcpConnectionPtr &conn, json &js,Timestamp time);
+    //创建群组
+    void createGroup(const TcpConnectionPtr &conn,json &js,Timestamp time);
+    //加入群组·
+    void addGroup(const TcpConnectionPtr &conn,json &js,Timestamp time);
+    //群组聊天业务
+    void groupChat(const TcpConnectionPtr &conn,json &js,Timestamp time);
 private:
     ChatService();
     //存储消息id和其对应的业务处理方法
@@ -50,5 +55,6 @@ private:
     UserModel userModel_;
     OfflineMsgModel offlineMsgModel_;
     FriendModel friendModel_;
+    GroupModel groupModel_;
 };
 #endif

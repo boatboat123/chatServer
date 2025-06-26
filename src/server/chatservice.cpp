@@ -69,7 +69,7 @@ void ChatService::login(const TcpConnectionPtr &conn, json &js, Timestamp time)
                 // 读取完之后把用户的所有离线消息删除掉
                 offlineMsgModel_.remove(user.getId());
             }
-            // 查询该用户的好友信息并返回
+            // 查询该用户的离线好友信息并返回
             vector<User> userVec = friendModel_.query(id);
             if (!userVec.empty())
             {
@@ -151,7 +151,7 @@ MsgHandler ChatService::getHandler(int msgid)
     }
 }
 
-//处理客户端异常退出
+// 处理客户端异常退出
 void ChatService::clientCloseException(const TcpConnectionPtr &conn)
 {
     User user;
@@ -203,4 +203,48 @@ void ChatService::addFriend(const TcpConnectionPtr &conn, json &js, Timestamp ti
 
     // 存储好友信息
     friendModel_.insert(userid, friendid);
+}
+
+// 创建群组业务
+void ChatService::createGroup(const TcpConnectionPtr &conn, json &js, Timestamp time)
+{
+    int userid = js["id"].get<int>();
+    string name = js["groupname"];
+    string desc = js["groupdesc"];
+
+    // 存储新创建的群组信息
+    Group group(-1, name, desc);
+    if (groupModel_.createGroup(group))
+    {
+        groupModel_.addGroup(userid, group.getId(), "creator");
+    }
+}
+
+// 加入群组业务
+void ChatService::addGroup(const TcpConnectionPtr &conn, json &js, Timestamp time)
+{
+    int userid = js["id"].get<int>();
+    int groupid = js["groupid"].get<int>();
+    groupModel_.addGroup(userid, groupid, "normal");
+}
+
+// 群组聊天业务
+void ChatService::groupChat(const TcpConnectionPtr &conn, json &js, Timestamp time)
+{
+    int userid = js["id"].get<int>();
+    int groupid = js["groupid"].get<int>();
+    vector<int> useridVec = groupModel_.queryGroupUsers(userid, groupid);
+    lock_guard<mutex> lock(mutex);
+    for (int id : useridVec)
+    {
+        auto it = connMap_.find(id);
+        if (it != connMap_.end())
+        {
+            it->second->send(js.dump());
+        }
+        else
+        {
+            offlineMsgModel_.insert(id, js.dump());
+        }
+    }
 }
