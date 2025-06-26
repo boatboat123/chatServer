@@ -69,7 +69,7 @@ void ChatService::login(const TcpConnectionPtr &conn, json &js, Timestamp time)
                 // 读取完之后把用户的所有离线消息删除掉
                 offlineMsgModel_.remove(user.getId());
             }
-            // 查询该用户的离线好友信息并返回
+            // 查询该用户的好友信息并返回
             vector<User> userVec = friendModel_.query(id);
             if (!userVec.empty())
             {
@@ -83,6 +83,34 @@ void ChatService::login(const TcpConnectionPtr &conn, json &js, Timestamp time)
                     friendList.push_back(js.dump());
                 }
                 response["friends"] = friendList;
+            }
+
+            // 查询用户的群组信息
+            vector<Group> groupuserVec = groupModel_.queryGroups(id);
+            if (!groupuserVec.empty())
+            {
+                // group:[{groupid:[xxx,xxx,xxx]}]
+                vector<string> groupV;
+                for (Group &group : groupuserVec)
+                {
+                    json grpjson;
+                    grpjson["id"] = group.getId();
+                    grpjson["groupname"] = group.getName();
+                    grpjson["groupdesx"] = group.getDesc();
+                    vector<string> userV;
+                    for (GroupUser &user : group.getUsers())
+                    {
+                        json js;
+                        js["id"] = user.getId();
+                        js["name"] = user.getName();
+                        js["state"] = user.getState();
+                        js["role"] = user.getRole();
+                        userV.push_back(js.dump());
+                    }
+                    grpjson["users"] = userV;
+                    groupV.push_back(grpjson.dump());
+                }
+                response["groups"] = groupV;
             }
             conn->send(response.dump());
         }
